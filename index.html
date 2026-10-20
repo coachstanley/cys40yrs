@@ -63,26 +63,9 @@
   <!-- 2. 主體時光軸區域 -->
   <main id="timeline-section" class="max-w-6xl mx-auto px-4 py-10 flex-1 w-full">
     
-    <!-- 分類動態篩選按鈕列 -->
+    <!-- 🚀 核心升級：分類動態篩選按鈕列 -->
     <div class="flex flex-wrap justify-center gap-2 mb-12" id="filter-buttons">
-      <button onclick="filterTimeline('all', this)" class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-blue-900 text-white shadow-sm transition">
-        全部里程碑
-      </button>
-      <button onclick="filterTimeline('創校奠基', this)" class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium bg-white text-slate-600 hover:bg-slate-200 shadow-sm transition">
-        創校奠基
-      </button>
-      <button onclick="filterTimeline('愛德共融', this)" class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium bg-white text-slate-600 hover:bg-slate-200 shadow-sm transition">
-        愛德共融
-      </button>
-      <button onclick="filterTimeline('汽車科技', this)" class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium bg-white text-slate-600 hover:bg-slate-200 shadow-sm transition">
-        汽車科技
-      </button>
-      <button onclick="filterTimeline('創科未來', this)" class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium bg-white text-slate-600 hover:bg-slate-200 shadow-sm transition">
-        創科未來
-      </button>
-      <button onclick="filterTimeline('卓越成就', this)" class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium bg-white text-slate-600 hover:bg-slate-200 shadow-sm transition">
-        卓越成就
-      </button>
+        <!-- 按鈕將由 JavaScript 動態生成 -->
     </div>
 
     <!-- 動態時光軸容器 -->
@@ -133,51 +116,11 @@
   <script>
     // 明愛元朗陳震夏中學專屬歷史事件資料庫
     const defaultEvents = [
-      {
-        id: 1,
-        year: "1988",
-        category: "創校奠基",
-        title: "創立明愛元朗陳震夏中學 · 奠定全人基石",
-        shortDesc: "香港明愛於元朗西裕街66號創立本校，秉承基督愛德精神，播下全人教育種子。",
-        fullDesc: "1988年，在香港明愛辦學團體推動下，明愛元朗陳震夏中學正式創校。全體創校師生秉持「忠誠勤樸，敬主愛人」校訓，立足元朗社區，推行「信仰基督，施行全人教育」的核心教育理念，開啟立德樹人的光輝篇章。",
-        image: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=80"
-      },
-      {
-        id: 2,
-        year: "2003",
-        category: "愛德共融",
-        title: "創設長者學苑 · 實踐跨代共融與社區關懷",
-        shortDesc: "積極推動天主教愛德服務，成立長者學苑，引領學生關懷社區長者，傳承敬老品格。",
-        fullDesc: "本校深信教育不限於課堂，積極深化生命教育。透過創辦長者學苑及系列社區服務計劃，鼓勵震夏學子走出校園，以實際行動關顧長者與弱勢社群，實現跨代互助、共融有愛的共融校園文化。",
-        image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80"
-      },
-      {
-        id: 3,
-        year: "2012",
-        category: "汽車科技",
-        title: "開辦實踐汽車科技文憑 · 引領職專實用教育",
-        shortDesc: "本地少數開辦高中實踐汽車科技之中學，配備專業實習工場，開拓多元出路。",
-        fullDesc: "為照顧學生的多元潛能，本校前瞻性地開辦「實踐汽車科技」應用學習課程，設置專門的車輛工程研習環境。課程結合理論與實務操作，為青年學子建立清晰的工程技術升學途徑與專業資格階梯。",
-        image: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=800&q=80"
-      },
-      {
-        id: 4,
-        year: "2020",
-        category: "創科未來",
-        title: "智慧校園與創客革新 · 培育新一代科技人才",
-        shortDesc: "全面升級資訊科技基礎設施，推動 STEAM 與生成式 AI 研發，師生屢獲創科殊榮。",
-        fullDesc: "資訊科技組引領學校數碼轉型，建立智慧運算與創客實驗空間。學生在微型電腦（Micro:bit）、機械人無障礙輔助技術及 AI 應用開發中展現出卓越的創客實踐力，將科技轉化為造福社會的具體成果。",
-        image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80"
-      },
-      {
-        id: 5,
-        year: "2023",
-        category: "卓越成就",
-        title: "歲月璀璨三十五載 · 傳承使命邁向新篇",
-        shortDesc: "隆重慶祝創校35周年，歷屆校友與師生齊聚一堂，見證桃李滿門、愛德傳承。",
-        fullDesc: "學校踏入建校35周年的歷史節點，全校師生以「傳承與創新」為主題，展開盛大的校慶感恩禮及科技體驗展。校友遍佈社會各專業領域，彰顯震夏學子敬主愛人、篤行致遠的卓越風範。",
-        image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80"
-      }
+      { id: 1, year: "1988", category: "創校奠基", title: "創立明愛元朗陳震夏中學 · 奠定全人基石", shortDesc: "香港明愛於元朗西裕街66號創立本校，秉承基督愛德精神，播下全人教育種子。", fullDesc: "1988年，在香港明愛辦學團體推動下，明愛元朗陳震夏中學正式創校。全體創校師生秉持「忠誠勤樸，敬主愛人」校訓，立足元朗社區，推行「信仰基督，施行全人教育」的核心教育理念，開啟立德樹人的光輝篇章。", image: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=80" },
+      { id: 2, year: "2003", category: "愛德共融", title: "創設長者學苑 · 實踐跨代共融與社區關懷", shortDesc: "積極推動天主教愛德服務，成立長者學苑，引領學生關懷社區長者，傳承敬老品格。", fullDesc: "本校深信教育不限於課堂，積極深化生命教育。透過創辦長者學苑及系列社區服務計劃，鼓勵震夏學子走出校園，以實際行動關顧長者與弱勢社群，實現跨代互助、共融有愛的共融校園文化。", image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80" },
+      { id: 3, year: "2012", category: "汽車科技", title: "開辦實踐汽車科技文憑 · 引領職專實用教育", shortDesc: "本地少數開辦高中實踐汽車科技之中學，配備專業實習工場，開拓多元出路。", fullDesc: "為照顧學生的多元潛能，本校前瞻性地開辦「實踐汽車科技」應用學習課程，設置專門的車輛工程研習環境。課程結合理論與實務操作，為青年學子建立清晰的工程技術升學途徑與專業資格階梯。", image: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=800&q=80" },
+      { id: 4, year: "2020", category: "創科未來", title: "智慧校園與創客革新 · 培育新一代科技人才", shortDesc: "全面升級資訊科技基礎設施，推動 STEAM 與生成式 AI 研發，師生屢獲創科殊榮。", fullDesc: "資訊科技組引領學校數碼轉型，建立智慧運算與創客實驗空間。學生在微型電腦（Micro:bit）、機械人無障礙輔助技術及 AI 應用開發中展現出卓越的創客實踐力，將科技轉化為造福社會的具體成果。", image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80" },
+      { id: 5, year: "2023", category: "卓越成就", title: "歲月璀璨三十五載 · 傳承使命邁向新篇", shortDesc: "隆重慶祝創校35周年，歷屆校友與師生齊聚一堂，見證桃李滿門、愛德傳承。", fullDesc: "學校踏入建校35周年的歷史節點，全校師生以「傳承與創新」為主題，展開盛大的校慶感恩禮及科技體驗展。校友遍佈社會各專業領域，彰顯震夏學子敬主愛人、篤行致遠的卓越風範。", image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80" }
     ];
 
     let activeEvents = [];
@@ -196,7 +139,31 @@
       }
 
       activeEvents.sort((a, b) => parseInt(a.year) - parseInt(b.year));
+      renderFilterButtons(); // 🚀 升級：渲染動態按鈕
       renderTimeline(activeEvents);
+    }
+    
+    // 🚀 核心升級：動態生成分類按鈕
+    function renderFilterButtons() {
+        const container = document.getElementById("filter-buttons");
+        if (!container) return;
+        
+        // 從數據中提取所有唯一的分類
+        const categories = [...new Set(activeEvents.map(event => event.category))];
+        
+        let buttonsHtml = `
+            <button onclick="filterTimeline('all', this)" class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-blue-900 text-white shadow-sm transition">
+                全部里程碑
+            </button>
+        `;
+        
+        const otherButtonClasses = "px-4 py-2 rounded-full text-xs sm:text-sm font-medium bg-white text-slate-600 hover:bg-slate-200 shadow-sm transition";
+        
+        categories.forEach(category => {
+            buttonsHtml += `<button onclick="filterTimeline('${category}', this)" class="filter-btn ${otherButtonClasses}">${category}</button>`;
+        });
+        
+        container.innerHTML = buttonsHtml;
     }
 
     // 渲染時間軸卡片
@@ -226,7 +193,7 @@
                 <div class="relative overflow-hidden rounded-xl mb-4 h-48 bg-slate-100">
                   <img src="${item.image}" 
                        referrerpolicy="no-referrer"
-                       onerror="this.src='https://placehold.co/800x500?text=震夏歷史照片'" 
+                       onerror="this.src='https://placehold.co/800x500?text=校史珍貴照片'" 
                        alt="${item.title}" 
                        class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                   <span class="absolute top-3 left-3 bg-blue-900/95 text-amber-300 text-xs px-2.5 py-1 rounded-full font-bold shadow">
@@ -300,6 +267,7 @@
       if (e.key === "Escape") closeModal();
     });
 
+    // 頁面載入完成時執行初始化
     window.onload = initData;
   </script>
 </body>
