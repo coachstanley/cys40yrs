@@ -11,7 +11,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen">
 
-  <!-- 1. 登入鎖定遮罩（原始碼無明文密碼） -->
+  <!-- 1. 登入鎖定遮罩（密碼安全遮蔽） -->
   <div id="login-overlay" class="fixed inset-0 bg-slate-900/95 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 border border-slate-200">
       <div class="text-center mb-6">
@@ -61,10 +61,24 @@
 
   <!-- 3. 主操作區 -->
   <main class="max-w-7xl mx-auto px-4 py-8">
+    
+    <!-- 學校雲端相簿快捷資訊 -->
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs">
+      <div>
+        <h4 class="font-bold text-blue-900 text-sm flex items-center gap-1">
+          <i class="fa-brands fa-google-drive"></i> 官方相片雲端硬碟已連接
+        </h4>
+        <p class="text-slate-600 mt-0.5">請將相片放入該資料夾，並確保分享權限設為「任何知道連結的人皆可檢視」。</p>
+      </div>
+      <a href="https://drive.google.com/drive/folders/15djkbfBgnFkOdxkA8gZmEk0bYVUVsKjw?usp=sharing" target="_blank" class="px-4 py-2 bg-blue-900 text-white hover:bg-blue-950 rounded-lg font-semibold flex items-center gap-1.5 shrink-0 shadow">
+        <i class="fa-solid fa-folder-open"></i> 開啟 Google Drive 資料夾
+      </a>
+    </div>
+
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <div>
         <h2 class="text-xl font-black text-slate-800">歷史里程碑列表</h2>
-        <p class="text-xs text-slate-500 mt-0.5">可在此處修改任何年份的文字與相片，儲存後前台即時同步更新。</p>
+        <p class="text-xs text-slate-500 mt-0.5">在下方新增或編輯事件，儲存後前台網頁會立即同步。</p>
       </div>
       <div class="flex gap-2">
         <button onclick="exportJSON()" class="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg text-xs font-bold shadow">
@@ -131,19 +145,21 @@
           <input type="text" id="form-title" required class="w-full p-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-900" placeholder="請輸入標題">
         </div>
 
-        <!-- 相片控制模組（支援網址或本地上傳） -->
-        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-          <label class="block font-bold text-slate-700 mb-2">相片控制與設定</label>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
-            <div>
-              <label class="text-[10px] text-slate-500 block mb-1">方式 A：貼上圖片公開網址</label>
-              <input type="url" id="form-image" oninput="updateImagePreview(this.value)" class="w-full p-2 rounded border border-slate-300 text-xs" placeholder="https://...">
-              
-              <label class="text-[10px] text-slate-500 block mt-2 mb-1">方式 B：從本機電腦選取上傳</label>
-              <input type="file" id="form-file" accept="image/*" onchange="handleFileUpload(event)" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-blue-900 file:text-white hover:file:bg-blue-800">
+        <!-- 相片控制模組（自動解析 Google Drive 連結） -->
+        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <label class="block font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+            <i class="fa-brands fa-google-drive text-emerald-600"></i> Google Drive 相片分享連結
+          </label>
+          <p class="text-[10px] text-slate-500 mb-2">直接在你的 Google Drive 對該相片點擊「共享 -> 複製連結」，並直接貼在下方，系統會自動轉換為網頁直鏈。</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+            <div class="sm:col-span-2">
+              <input type="url" id="form-image" oninput="handleImageInput(this.value)" required class="w-full p-2.5 rounded border border-slate-300 text-xs" placeholder="請貼上相片的共享連結（例如：https://drive.google.com/...）">
+              <span id="convert-badge" class="hidden mt-1 text-[10px] text-emerald-600 font-bold items-center gap-1">
+                <i class="fa-solid fa-circle-check"></i> 已自動將其轉換為 Google 直鏈格式！
+              </span>
             </div>
-            <div class="flex flex-col items-center justify-center">
-              <span class="text-[10px] text-slate-400 mb-1">相片預覽視窗</span>
+            <div class="flex flex-col items-center justify-center border-l border-slate-200 pl-4 sm:pl-0">
+              <span class="text-[10px] text-slate-400 mb-1">相片預覽</span>
               <img id="form-image-preview" src="" alt="預覽" class="w-32 h-20 object-cover rounded border border-slate-200 bg-slate-200">
             </div>
           </div>
@@ -191,6 +207,38 @@
       return true;
     }
 
+    // Google Drive 分享連結自動轉換直鏈邏輯
+    function convertGoogleDriveLink(url) {
+      if (!url) return "";
+      
+      // 比對常規分享連結與直鏈下載 ID 提取
+      const driveRegex = /(?:\/file\/d\/|id=)([^/?]+)/;
+      const match = url.match(driveRegex);
+      
+      if (match && match[1]) {
+        const fileId = match[1];
+        // 轉換為通用直鏈讀取格式
+        return `https://drive.google.com/thumbnail?sz=w1000&id=${fileId}`;
+      }
+      return url;
+    }
+
+    // 輸入連結時的動態解析
+    function handleImageInput(val) {
+      const converted = convertGoogleDriveLink(val);
+      const badge = document.getElementById("convert-badge");
+      
+      if (converted !== val) {
+        document.getElementById("form-image").value = converted;
+        badge.classList.remove("hidden");
+        badge.classList.add("flex");
+        updateImagePreview(converted);
+      } else {
+        badge.classList.add("hidden");
+        updateImagePreview(val);
+      }
+    }
+
     // 預設資料庫（若 LocalStorage 無資料時載入）
     const defaultEvents = [
       {
@@ -210,33 +258,6 @@
         shortDesc: "新教學大樓啟用，落成多用途禮堂、電腦室及各項多媒體學習中心，提升教學環境。",
         fullDesc: "為配合資訊科技教育潮流，學校積極爭取各方資源，新建大樓增添了專門的實驗室與資訊科技學習設施，讓學生能在更完善的環境中探索科學與新知。",
         image: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=800&q=80"
-      },
-      {
-        id: 3,
-        year: "2013",
-        category: "卓越成就",
-        title: "銀禧校慶 · 桃李遍佈各界",
-        shortDesc: "慶祝創校25周年，歷屆畢業校友齊聚一堂，見證學校在學術、體育與藝術各領域取得豐碩成果。",
-        fullDesc: "在銀禧慶典上，學校舉行了盛大的校慶感恩祭與開放日。大批傑出校友重返母校，分享在各大專業領域的奮鬥成果，設立多個獎學金勉勵學弟學妹發奮圖強。",
-        image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80"
-      },
-      {
-        id: 4,
-        year: "2020",
-        category: "創新未來",
-        title: "數碼轉型 · 建立超算與AI中心",
-        shortDesc: "全面升級校園網絡與雲端基礎設施，引進生成式AI與機械人研發空間，賦能學生科技創新。",
-        fullDesc: "學校前瞻性地將新興科技融入日常教學與行政，建立專屬的運算中心與STEAM創客基地。師生共同研發出多項無障礙科技發明與校園數碼管理系統，榮獲多項全港創科競賽大獎。",
-        image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80"
-      },
-      {
-        id: 5,
-        year: "2024",
-        category: "創新未來",
-        title: "邁向新里程 · 雲端時光漫步",
-        shortDesc: "正式啟動校慶系列慶祝活動，全校師生共創智慧校園，傳承使命邁向下一個璀璨年代。",
-        fullDesc: "今年校慶以「傳承與創新」為主題，資訊科技組學生運用開源技術研發出雲端時光隧道與智能校園問答助手，展現了新一代學生的數碼素養與創客精神。",
-        image: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80"
       }
     ];
 
@@ -286,7 +307,6 @@
       const tbody = document.getElementById("events-table-body");
       tbody.innerHTML = "";
 
-      // 依年份排序
       currentEvents.sort((a, b) => parseInt(a.year) - parseInt(b.year));
 
       currentEvents.forEach(item => {
@@ -321,6 +341,7 @@
     function openEditModal(id) {
       const modal = document.getElementById("edit-modal");
       modal.classList.remove("hidden");
+      document.getElementById("convert-badge").classList.add("hidden");
 
       if (id !== null) {
         document.getElementById("modal-form-title").innerText = "編輯歷史里程碑";
@@ -345,21 +366,9 @@
       document.getElementById("edit-modal").classList.add("hidden");
     }
 
-    // 相片即時預覽與上傳轉換（Base64）
+    // 相片即時預覽
     function updateImagePreview(url) {
       document.getElementById("form-image-preview").src = url || "https://placehold.co/120x80?text=No+Image";
-    }
-
-    function handleFileUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const base64Url = event.target.result;
-        document.getElementById("form-image").value = base64Url;
-        updateImagePreview(base64Url);
-      };
-      reader.readAsDataURL(file);
     }
 
     // 儲存事件
@@ -371,7 +380,7 @@
         year: document.getElementById("form-year").value.trim(),
         category: document.getElementById("form-category").value,
         title: document.getElementById("form-title").value.trim(),
-        image: document.getElementById("form-image").value.trim() || "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80",
+        image: document.getElementById("form-image").value.trim(),
         shortDesc: document.getElementById("form-shortDesc").value.trim(),
         fullDesc: document.getElementById("form-fullDesc").value.trim()
       };
@@ -386,7 +395,7 @@
       localStorage.setItem("cys_timeline_events", JSON.stringify(currentEvents));
       closeEditModal();
       renderTable();
-      alert("儲存成功！前台已即時同步更新。");
+      alert("儲存成功！");
     }
 
     // 刪除事件
