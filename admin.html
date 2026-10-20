@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>校慶時光隧道 · 資訊管理後台</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome 圖示 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen">
+
+  <!-- 1. 登入鎖定遮罩（原始碼無明文密碼） -->
+  <div id="login-overlay" class="fixed inset-0 bg-slate-900/95 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 border border-slate-200">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-blue-900 text-amber-400 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl shadow">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <h2 class="text-2xl font-black text-slate-800">校慶後台身分驗證</h2>
+        <p class="text-slate-500 text-xs mt-1">請輸入資訊科技組專屬管理憑證以存取系統</p>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">管理員帳戶</label>
+          <input type="text" id="auth-user" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-900 focus:outline-none text-sm" placeholder="請輸入帳號">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">驗證密碼</label>
+          <input type="password" id="auth-pass" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-900 focus:outline-none text-sm" placeholder="請輸入管理密碼">
+        </div>
+        <div id="login-error" class="hidden text-xs text-rose-600 font-bold text-center">
+          帳戶或密碼錯誤，請重新確認！
+        </div>
+        <button onclick="handleLogin()" class="w-full py-3 bg-blue-900 hover:bg-blue-950 text-amber-400 font-bold rounded-lg shadow transition duration-200 text-sm">
+          解鎖並進入管理控制台
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 後台頂部欄 -->
+  <header class="bg-blue-900 text-white shadow sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <i class="fa-solid fa-timeline text-amber-400 text-xl"></i>
+        <h1 class="text-lg font-bold">校慶時光隧道 · 圖文內容管理中心</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="index.html" target="_blank" class="px-3 py-1.5 bg-blue-800 hover:bg-blue-700 text-xs rounded-lg text-amber-300 font-semibold transition">
+          <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>預覽前台
+        </a>
+        <button onclick="handleLogout()" class="px-3 py-1.5 bg-rose-800 hover:bg-rose-700 text-xs rounded-lg text-white font-semibold transition">
+          <i class="fa-solid fa-right-from-bracket mr-1"></i>安全登出
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 3. 主操作區 -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <div>
+        <h2 class="text-xl font-black text-slate-800">歷史里程碑列表</h2>
+        <p class="text-xs text-slate-500 mt-0.5">可在此處修改任何年份的文字與相片，儲存後前台即時同步更新。</p>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="exportJSON()" class="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg text-xs font-bold shadow">
+          <i class="fa-solid fa-file-export mr-1"></i>匯出 JSON 備份
+        </button>
+        <button onclick="openEditModal(null)" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-lg text-xs font-bold shadow">
+          <i class="fa-solid fa-plus mr-1"></i>新增歷史事件
+        </button>
+      </div>
+    </div>
+
+    <!-- 事件表格 -->
+    <div class="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="bg-slate-50 text-slate-600 uppercase border-b border-slate-200">
+            <tr>
+              <th class="p-4 w-20">年份</th>
+              <th class="p-4 w-28">相片預覽</th>
+              <th class="p-4 w-24">分類類別</th>
+              <th class="p-4">標題與簡介摘要</th>
+              <th class="p-4 w-32 text-center">操作</th>
+            </tr>
+          </thead>
+          <tbody id="events-table-body" class="divide-y divide-slate-100">
+            <!-- 動態填入 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- 4. 編輯/新增事件彈窗 -->
+  <div id="edit-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl my-8">
+      <div class="flex justify-between items-center pb-3 border-b border-slate-200 mb-4">
+        <h3 id="modal-form-title" class="text-base font-black text-slate-800">編輯歷史里程碑</h3>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="event-form" onsubmit="saveEvent(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="form-id">
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">發生年份</label>
+            <input type="text" id="form-year" required class="w-full p-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-900" placeholder="例如: 1988 或 2024">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">所屬類別</label>
+            <select id="form-category" class="w-full p-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-900">
+              <option value="創校奠基">創校奠基</option>
+              <option value="校園建設">校園建設</option>
+              <option value="卓越成就">卓越成就</option>
+              <option value="創新未來">創新未來</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">事件標題</label>
+          <input type="text" id="form-title" required class="w-full p-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-900" placeholder="請輸入標題">
+        </div>
+
+        <!-- 相片控制模組（支援網址或本地上傳） -->
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+          <label class="block font-bold text-slate-700 mb-2">相片控制與設定</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+            <div>
+              <label class="text-[10px] text-slate-500 block mb-1">方式 A：貼上圖片公開網址</label>
+              <input type="url" id="form-image" oninput="updateImagePreview(this.value)" class="w-full p-2 rounded border border-slate-300 text-xs" placeholder="https://...">
+              
+              <label class="text-[10px] text-slate-500 block mt-2 mb-1">方式 B：從本機電腦選取上傳</label>
+              <input type="file" id="form-file" accept="image/*" onchange="handleFileUpload(event)" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-blue-900 file:text-white hover:file:bg-blue-800">
+            </div>
+            <div class="flex flex-col items-center justify-center">
+              <span class="text-[10px] text-slate-400 mb-1">相片預覽視窗</span>
+              <img id="form-image-preview" src="" alt="預覽" class="w-32 h-20 object-cover rounded border border-slate-200 bg-slate-200">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">卡片簡介（手機卡片顯示）</label>
+          <textarea id="form-shortDesc" rows="2" required class="w-full p-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-900" placeholder="約 30-50 字概述"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">詳細故事內容（點開彈窗顯示）</label>
+          <textarea id="form-fullDesc" rows="4" required class="w-full p-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-900" placeholder="完整歷史紀錄與詳細故事"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
+          <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg text-slate-700 font-bold">
+            取消
+          </button>
+          <button type="submit" class="px-5 py-2 bg-blue-900 hover:bg-blue-950 text-amber-400 font-bold rounded-lg shadow">
+            確認儲存變更
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // 憑證安全遮蔽演算法（原始碼不含任何帳號密碼明文字串）
+    // ==========================================
+    const _SIG_U = [114, 27, 0];
+    const _SALT_U = [0x31, 0x42, 0x53];
+    const _SIG_P = [121, 82, 79, 127, 106, 88, 69, 180, 166, 144, 134];
+    const _SALT_P = [0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F, 0x70, 0x81, 0x92, 0xA3, 0xB4];
+
+    function verifyCredentials(user, pass) {
+      if (user.length !== _SIG_U.length || pass.length !== _SIG_P.length) return false;
+      for (let i = 0; i < user.length; i++) {
+        if ((user.charCodeAt(i) ^ _SALT_U[i]) !== _SIG_U[i]) return false;
+      }
+      for (let i = 0; i < pass.length; i++) {
+        if ((pass.charCodeAt(i) ^ _SALT_P[i]) !== _SIG_P[i]) return false;
+      }
+      return true;
+    }
+
+    // 預設資料庫（若 LocalStorage 無資料時載入）
+    const defaultEvents = [
+      {
+        id: 1,
+        year: "1988",
+        category: "創校奠基",
+        title: "學校創校 · 奠定教育宏圖",
+        shortDesc: "校舍正式落成啟用，首任校長與全體教職員帶領首屆學生踏入校園，播下全人教育的種子。",
+        fullDesc: "學校在熱心辦學團體支持下正式創立，秉持愛與關懷的精神。首批教職員開拓創新，建立嚴謹篤實的校風與深厚師生情誼，開啟光輝歷史的第一頁。",
+        image: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: 2,
+        year: "1998",
+        category: "校園建設",
+        title: "十周年校慶 · 擴建工程竣工",
+        shortDesc: "新教學大樓啟用，落成多用途禮堂、電腦室及各項多媒體學習中心，提升教學環境。",
+        fullDesc: "為配合資訊科技教育潮流，學校積極爭取各方資源，新建大樓增添了專門的實驗室與資訊科技學習設施，讓學生能在更完善的環境中探索科學與新知。",
+        image: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: 3,
+        year: "2013",
+        category: "卓越成就",
+        title: "銀禧校慶 · 桃李遍佈各界",
+        shortDesc: "慶祝創校25周年，歷屆畢業校友齊聚一堂，見證學校在學術、體育與藝術各領域取得豐碩成果。",
+        fullDesc: "在銀禧慶典上，學校舉行了盛大的校慶感恩祭與開放日。大批傑出校友重返母校，分享在各大專業領域的奮鬥成果，設立多個獎學金勉勵學弟學妹發奮圖強。",
+        image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: 4,
+        year: "2020",
+        category: "創新未來",
+        title: "數碼轉型 · 建立超算與AI中心",
+        shortDesc: "全面升級校園網絡與雲端基礎設施，引進生成式AI與機械人研發空間，賦能學生科技創新。",
+        fullDesc: "學校前瞻性地將新興科技融入日常教學與行政，建立專屬的運算中心與STEAM創客基地。師生共同研發出多項無障礙科技發明與校園數碼管理系統，榮獲多項全港創科競賽大獎。",
+        image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: 5,
+        year: "2024",
+        category: "創新未來",
+        title: "邁向新里程 · 雲端時光漫步",
+        shortDesc: "正式啟動校慶系列慶祝活動，全校師生共創智慧校園，傳承使命邁向下一個璀璨年代。",
+        fullDesc: "今年校慶以「傳承與創新」為主題，資訊科技組學生運用開源技術研發出雲端時光隧道與智能校園問答助手，展現了新一代學生的數碼素養與創客精神。",
+        image: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80"
+      }
+    ];
+
+    let currentEvents = [];
+
+    // 初始化與驗證狀態檢查
+    window.onload = function() {
+      if (sessionStorage.getItem("cys_admin_logged") === "true") {
+        document.getElementById("login-overlay").classList.add("hidden");
+        loadEvents();
+      }
+    };
+
+    function handleLogin() {
+      const u = document.getElementById("auth-user").value.trim();
+      const p = document.getElementById("auth-pass").value.trim();
+
+      if (verifyCredentials(u, p)) {
+        sessionStorage.setItem("cys_admin_logged", "true");
+        document.getElementById("login-overlay").classList.add("hidden");
+        document.getElementById("login-error").classList.add("hidden");
+        loadEvents();
+      } else {
+        document.getElementById("login-error").classList.remove("hidden");
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem("cys_admin_logged");
+      location.reload();
+    }
+
+    // 載入事件資料
+    function loadEvents() {
+      const stored = localStorage.getItem("cys_timeline_events");
+      if (stored) {
+        currentEvents = JSON.parse(stored);
+      } else {
+        currentEvents = [...defaultEvents];
+        localStorage.setItem("cys_timeline_events", JSON.stringify(currentEvents));
+      }
+      renderTable();
+    }
+
+    // 渲染管理表格
+    function renderTable() {
+      const tbody = document.getElementById("events-table-body");
+      tbody.innerHTML = "";
+
+      // 依年份排序
+      currentEvents.sort((a, b) => parseInt(a.year) - parseInt(b.year));
+
+      currentEvents.forEach(item => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+          <td class="p-4 font-black text-blue-900 text-sm">${item.year}</td>
+          <td class="p-4">
+            <img src="${item.image}" class="w-16 h-10 object-cover rounded border border-slate-200">
+          </td>
+          <td class="p-4">
+            <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-bold">${item.category}</span>
+          </td>
+          <td class="p-4">
+            <div class="font-bold text-slate-800">${item.title}</div>
+            <div class="text-slate-500 line-clamp-1 mt-0.5">${item.shortDesc}</div>
+          </td>
+          <td class="p-4 text-center">
+            <button onclick="openEditModal(${item.id})" class="px-2.5 py-1 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded font-semibold mr-1">
+              編輯
+            </button>
+            <button onclick="deleteEvent(${item.id})" class="px-2.5 py-1 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded font-semibold">
+              刪除
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 開啟編輯彈窗
+    function openEditModal(id) {
+      const modal = document.getElementById("edit-modal");
+      modal.classList.remove("hidden");
+
+      if (id !== null) {
+        document.getElementById("modal-form-title").innerText = "編輯歷史里程碑";
+        const item = currentEvents.find(e => e.id === id);
+        document.getElementById("form-id").value = item.id;
+        document.getElementById("form-year").value = item.year;
+        document.getElementById("form-category").value = item.category;
+        document.getElementById("form-title").value = item.title;
+        document.getElementById("form-image").value = item.image;
+        document.getElementById("form-shortDesc").value = item.shortDesc;
+        document.getElementById("form-fullDesc").value = item.fullDesc;
+        updateImagePreview(item.image);
+      } else {
+        document.getElementById("modal-form-title").innerText = "新增歷史里程碑";
+        document.getElementById("event-form").reset();
+        document.getElementById("form-id").value = "";
+        updateImagePreview("");
+      }
+    }
+
+    function closeEditModal() {
+      document.getElementById("edit-modal").classList.add("hidden");
+    }
+
+    // 相片即時預覽與上傳轉換（Base64）
+    function updateImagePreview(url) {
+      document.getElementById("form-image-preview").src = url || "https://placehold.co/120x80?text=No+Image";
+    }
+
+    function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const base64Url = event.target.result;
+        document.getElementById("form-image").value = base64Url;
+        updateImagePreview(base64Url);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // 儲存事件
+    function saveEvent(e) {
+      e.preventDefault();
+      const id = document.getElementById("form-id").value;
+      const newEvent = {
+        id: id ? parseInt(id) : Date.now(),
+        year: document.getElementById("form-year").value.trim(),
+        category: document.getElementById("form-category").value,
+        title: document.getElementById("form-title").value.trim(),
+        image: document.getElementById("form-image").value.trim() || "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80",
+        shortDesc: document.getElementById("form-shortDesc").value.trim(),
+        fullDesc: document.getElementById("form-fullDesc").value.trim()
+      };
+
+      if (id) {
+        const index = currentEvents.findIndex(item => item.id === parseInt(id));
+        currentEvents[index] = newEvent;
+      } else {
+        currentEvents.push(newEvent);
+      }
+
+      localStorage.setItem("cys_timeline_events", JSON.stringify(currentEvents));
+      closeEditModal();
+      renderTable();
+      alert("儲存成功！前台已即時同步更新。");
+    }
+
+    // 刪除事件
+    function deleteEvent(id) {
+      if (!confirm("確定要刪除這個歷史里程碑嗎？")) return;
+      currentEvents = currentEvents.filter(e => e.id !== id);
+      localStorage.setItem("cys_timeline_events", JSON.stringify(currentEvents));
+      renderTable();
+    }
+
+    // 匯出 JSON
+    function exportJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentEvents, null, 2));
+      const downloadAnchor = document.createElement("a");
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "cys_timeline_data.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+  </script>
+</body>
+</html>
