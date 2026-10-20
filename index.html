@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>校慶雲端時光隧道 | 歲月璀璨 · 桃李芬芳</title>
+  <title>明愛元朗陳震夏中學 | 校慶雲端時光隧道</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome 圖示 -->
+  <!-- FontAwesome 圖示庫 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    html { scroll-behavior: smooth; }
-    /* 時間軸中心導引線（電腦版） */
+    html {
+      scroll-behavior: smooth;
+    }
+    /* 時間軸中心引導線（電腦版） */
     .timeline-container::before {
       content: '';
       position: absolute;
@@ -21,7 +23,7 @@
       background: #cbd5e1;
       transform: translateX(-50%);
     }
-    /* 手機版導引線靠左 */
+    /* 手機版時間軸引導線靠左 */
     @media (max-width: 768px) {
       .timeline-container::before {
         left: 28px;
@@ -31,151 +33,203 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-  <!-- 頂部導航與橫幅 -->
-  <header class="bg-gradient-to-r from-blue-900 via-indigo-800 to-blue-950 text-white shadow-lg sticky top-0 z-40">
+  <!-- 1. 頂部橫幅與校本導航 -->
+  <header class="bg-gradient-to-r from-blue-950 via-indigo-900 to-slate-900 text-white shadow-xl sticky top-0 z-40 border-b border-amber-500/30">
     <div class="max-w-6xl mx-auto px-4 py-6 flex flex-col sm:flex-row justify-between items-center gap-4">
       <div class="text-center sm:text-left">
-        <span class="inline-block px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-semibold rounded-full border border-amber-400/30 mb-2">
-          紀念特輯 · 歷史迴廊
-        </span>
-        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">校慶雲端時光隧道 ⏳</h1>
-        <p class="text-slate-300 text-sm mt-1">走過歲月長河，見證學校卓越成長歷程</p>
+        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-2">
+          <span class="px-3 py-0.5 bg-rose-700 text-white text-xs font-bold rounded-full shadow">
+            香港明愛 Caritas
+          </span>
+          <span class="px-3 py-0.5 bg-amber-500/20 text-amber-300 text-xs font-semibold rounded-full border border-amber-400/40">
+            校訓：忠誠勤樸 · 敬主愛人
+          </span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black tracking-tight flex items-center justify-center sm:justify-start gap-2">
+          明愛元朗陳震夏中學 <span class="text-amber-400 font-light text-xl sm:text-2xl">| 校慶時光隧道 ⏳</span>
+        </h1>
+        <p class="text-slate-300 text-xs sm:text-sm mt-1">
+          新界元朗西裕街66號 · 信仰基督 · 施行全人教育
+        </p>
       </div>
       <div class="flex items-center gap-3">
-        <a href="#timeline-section" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold rounded-lg text-sm shadow transition duration-200">
-          開始探索
+        <a href="#timeline-section" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-xl text-xs sm:text-sm shadow-md transition duration-200">
+          探索歷史里程碑
         </a>
       </div>
     </div>
   </header>
 
-  <!-- 主體內容 -->
-  <main id="timeline-section" class="max-w-6xl mx-auto px-4 py-12 flex-1 w-full">
+  <!-- 2. 主體時光軸區域 -->
+  <main id="timeline-section" class="max-w-6xl mx-auto px-4 py-10 flex-1 w-full">
     
-    <!-- 分類篩選按鈕列 -->
+    <!-- 分類動態篩選按鈕列 -->
     <div class="flex flex-wrap justify-center gap-2 mb-12" id="filter-buttons">
-      <button onclick="filterTimeline('all')" class="filter-btn active px-4 py-2 rounded-full text-sm font-medium bg-blue-900 text-white shadow">
+      <button onclick="filterTimeline('all', this)" class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-blue-900 text-white shadow-sm transition">
         全部里程碑
       </button>
-      <button onclick="filterTimeline('創校奠基')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 hover:bg-slate-200 shadow">
+      <button onclick="filterTimeline('創校奠基', this)" class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium bg-white text-slate-600 hover:bg-slate-200 shadow-sm transition">
         創校奠基
       </button>
-      <button onclick="filterTimeline('校園建設')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 hover:bg-slate-200 shadow">
-        校園建設
+      <button onclick="filterTimeline('愛德共融', this)" class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium bg-white text-slate-600 hover:bg-slate-200 shadow-sm transition">
+        愛德共融
       </button>
-      <button onclick="filterTimeline('卓越成就')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 hover:bg-slate-200 shadow">
+      <button onclick="filterTimeline('汽車科技', this)" class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium bg-white text-slate-600 hover:bg-slate-200 shadow-sm transition">
+        汽車科技
+      </button>
+      <button onclick="filterTimeline('創科未來', this)" class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium bg-white text-slate-600 hover:bg-slate-200 shadow-sm transition">
+        創科未來
+      </button>
+      <button onclick="filterTimeline('卓越成就', this)" class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-medium bg-white text-slate-600 hover:bg-slate-200 shadow-sm transition">
         卓越成就
-      </button>
-      <button onclick="filterTimeline('創新未來')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 hover:bg-slate-200 shadow">
-        創新未來
       </button>
     </div>
 
     <!-- 動態時光軸容器 -->
     <div class="relative timeline-container" id="timeline-content">
-      <!-- 事件卡片由 JavaScript 動態渲染 -->
+      <!-- 內容由 JavaScript 依據 LocalStorage 或校本資料動態產生 -->
     </div>
   </main>
 
-  <!-- 詳情彈窗（Modal） -->
-  <div id="detail-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl transform transition-all">
-      <div class="relative">
-        <img id="modal-img" src="" alt="歷史圖片" class="w-full h-64 sm:h-80 object-cover">
-        <button onclick="closeModal()" class="absolute top-4 right-4 bg-black/60 text-white rounded-full w-9 h-9 flex items-center justify-center hover:bg-black/90">
+  <!-- 3. 圖文詳情彈窗（Modal Lightbox） -->
+  <div id="detail-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl transform transition-all max-h-[90vh] flex flex-col">
+      <div class="relative shrink-0">
+        <img id="modal-img" referrerpolicy="no-referrer" src="" alt="歷史圖片" class="w-full h-64 sm:h-80 object-cover bg-slate-200">
+        <button onclick="closeModal()" class="absolute top-4 right-4 bg-black/60 text-white rounded-full w-9 h-9 flex items-center justify-center hover:bg-black/90 transition shadow">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
-        <span id="modal-category" class="absolute bottom-4 left-4 bg-blue-900 text-amber-300 text-xs px-3 py-1 rounded-full font-semibold"></span>
+        <span id="modal-category" class="absolute bottom-4 left-4 bg-blue-900/95 text-amber-300 text-xs px-3 py-1 rounded-full font-bold shadow"></span>
       </div>
-      <div class="p-6">
+      <div class="p-6 overflow-y-auto">
         <div class="flex items-baseline gap-3 mb-2">
-          <span id="modal-year" class="text-3xl font-extrabold text-blue-900"></span>
-          <h3 id="modal-title" class="text-xl font-bold text-slate-900"></h3>
+          <span id="modal-year" class="text-3xl font-black text-blue-900"></span>
+          <h3 id="modal-title" class="text-lg sm:text-xl font-bold text-slate-900"></h3>
         </div>
-        <p id="modal-desc" class="text-slate-600 leading-relaxed text-sm sm:text-base mt-4"></p>
+        <p id="modal-desc" class="text-slate-600 leading-relaxed text-xs sm:text-sm mt-4 whitespace-pre-line"></p>
         <div class="mt-6 flex justify-end">
-          <button onclick="closeModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg text-sm font-semibold">
+          <button onclick="closeModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg text-xs sm:text-sm font-bold transition">
             關閉視窗
           </button>
         </div>
       </div>
     </div>
+  </div>
 
-  <!-- 頁尾 -->
-  <footer class="bg-slate-900 text-slate-400 py-6 text-center text-xs">
-    <p>© 校慶籌備委員會 & 資訊科技組（IT組）聯合呈獻</p>
-    <p class="mt-1">用科技典藏回憶，以初心共創明天</p>
+  <!-- 4. 頁尾與後台入口 -->
+  <footer class="bg-slate-900 text-slate-400 py-6 text-center text-xs border-t border-slate-800">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <p>© 明愛元朗陳震夏中學 · 資訊科技組（IT組）聯合呈獻</p>
+      <div class="flex items-center gap-4">
+        <span>忠誠勤樸 · 敬主愛人</span>
+        <a href="admin.html" class="inline-flex items-center text-slate-500 hover:text-amber-400 transition ml-2">
+          <i class="fa-solid fa-lock text-[10px] mr-1"></i>後台登入
+        </a>
+      </div>
+    </div>
   </footer>
 
-  <!-- 資料與前端邏輯 -->
+  <!-- 5. 核心校本資料與互動邏輯 -->
   <script>
-    // 學生主要編輯此陣列即可更新全站內容
-    const timelineEvents = [
+    // 明愛元朗陳震夏中學專屬歷史事件資料庫
+    const defaultEvents = [
       {
         id: 1,
         year: "1988",
         category: "創校奠基",
-        title: "學校創校 · 奠定教育宏圖",
-        shortDesc: "校舍正式落成啟用，首任校長與全體教職員帶領首屆學生踏入校園，播下全人教育的種子。",
-        fullDesc: "學校在熱心辦學團體支持下正式創立，秉持愛與關懷的精神。首批教職員開拓創新，建立嚴謹篤實的校風與深厚師生情誼，開啟光輝歷史的第一頁。",
+        title: "創立明愛元朗陳震夏中學 · 奠定全人基石",
+        shortDesc: "香港明愛於元朗西裕街66號創立本校，秉承基督愛德精神，播下全人教育種子。",
+        fullDesc: "1988年，在香港明愛辦學團體推動下，明愛元朗陳震夏中學正式創校。全體創校師生秉持「忠誠勤樸，敬主愛人」校訓，立足元朗社區，推行「信仰基督，施行全人教育」的核心教育理念，開啟立德樹人的光輝篇章。",
         image: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=80"
       },
       {
         id: 2,
-        year: "1998",
-        category: "校園建設",
-        title: "十周年校慶 · 擴建工程竣工",
-        shortDesc: "新教學大樓啟用，落成多用途禮堂、電腦室及各項多媒體學習中心，提升教學環境。",
-        fullDesc: "為配合資訊科技教育潮流，學校積極爭取各方資源，新建大樓增添了專門的實驗室與資訊科技學習設施，讓學生能在更完善的環境中探索科學與新知。",
-        image: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=800&q=80"
+        year: "2003",
+        category: "愛德共融",
+        title: "創設長者學苑 · 實踐跨代共融與社區關懷",
+        shortDesc: "積極推動天主教愛德服務，成立長者學苑，引領學生關懷社區長者，傳承敬老品格。",
+        fullDesc: "本校深信教育不限於課堂，積極深化生命教育。透過創辦長者學苑及系列社區服務計劃，鼓勵震夏學子走出校園，以實際行動關顧長者與弱勢社群，實現跨代互助、共融有愛的共融校園文化。",
+        image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80"
       },
       {
         id: 3,
-        year: "2013",
-        category: "卓越成就",
-        title: "銀禧校慶 · 桃李遍佈各界",
-        shortDesc: "慶祝創校25周年，歷屆畢業校友齊聚一堂，見證學校在學術、體育與藝術各領域取得豐碩成果。",
-        fullDesc: "在銀禧慶典上，學校舉行了盛大的校慶感恩祭與開放日。大批傑出校友重返母校，分享在各大專業領域的奮鬥成果，設立多個獎學金勉勵學弟學妹發奮圖強。",
-        image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80"
+        year: "2012",
+        category: "汽車科技",
+        title: "開辦實踐汽車科技文憑 · 引領職專實用教育",
+        shortDesc: "本地少數開辦高中實踐汽車科技之中學，配備專業實習工場，開拓多元出路。",
+        fullDesc: "為照顧學生的多元潛能，本校前瞻性地開辦「實踐汽車科技」應用學習課程，設置專門的車輛工程研習環境。課程結合理論與實務操作，為青年學子建立清晰的工程技術升學途徑與專業資格階梯。",
+        image: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=800&q=80"
       },
       {
         id: 4,
         year: "2020",
-        category: "創新未來",
-        title: "數碼轉型 · 建立超算與AI中心",
-        shortDesc: "全面升級校園網絡與雲端基礎設施，引進生成式AI與機械人研發空間，賦能學生科技創新。",
-        fullDesc: "學校前瞻性地將新興科技融入日常教學與行政，建立專屬的運算中心與STEAM創客基地。師生共同研發出多項無障礙科技發明與校園數碼管理系統，榮獲多項全港創科競賽大獎。",
+        category: "創科未來",
+        title: "智慧校園與創客革新 · 培育新一代科技人才",
+        shortDesc: "全面升級資訊科技基礎設施，推動 STEAM 與生成式 AI 研發，師生屢獲創科殊榮。",
+        fullDesc: "資訊科技組引領學校數碼轉型，建立智慧運算與創客實驗空間。學生在微型電腦（Micro:bit）、機械人無障礙輔助技術及 AI 應用開發中展現出卓越的創客實踐力，將科技轉化為造福社會的具體成果。",
         image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80"
       },
       {
         id: 5,
-        year: "2024",
-        category: "創新未來",
-        title: "邁向新里程 · 雲端時光漫步",
-        shortDesc: "正式啟動校慶系列慶祝活動，全校師生共創智慧校園，傳承使命邁向下一個璀璨年代。",
-        fullDesc: "今年校慶以「傳承與創新」為主題，資訊科技組學生運用開源技術研發出雲端時光隧道與智能校園問答助手，展現了新一代學生的數碼素養與創客精神。",
-        image: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80"
+        year: "2023",
+        category: "卓越成就",
+        title: "歲月璀璨三十五載 · 傳承使命邁向新篇",
+        shortDesc: "隆重慶祝創校35周年，歷屆校友與師生齊聚一堂，見證桃李滿門、愛德傳承。",
+        fullDesc: "學校踏入建校35周年的歷史節點，全校師生以「傳承與創新」為主題，展開盛大的校慶感恩禮及科技體驗展。校友遍佈社會各專業領域，彰顯震夏學子敬主愛人、篤行致遠的卓越風範。",
+        image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80"
       }
     ];
 
-    // 渲染時光軸卡片
+    let activeEvents = [];
+
+    // 初始化：優先載入後台已儲存的資料，並依年份遞增排序
+    function initData() {
+      const stored = localStorage.getItem("cys_timeline_events");
+      if (stored) {
+        try {
+          activeEvents = JSON.parse(stored);
+        } catch (e) {
+          activeEvents = [...defaultEvents];
+        }
+      } else {
+        activeEvents = [...defaultEvents];
+      }
+
+      activeEvents.sort((a, b) => parseInt(a.year) - parseInt(b.year));
+      renderTimeline(activeEvents);
+    }
+
+    // 渲染時間軸卡片
     function renderTimeline(events) {
       const container = document.getElementById("timeline-content");
       container.innerHTML = "";
 
+      if (events.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-slate-400">
+            <i class="fa-solid fa-folder-open text-4xl mb-2"></i>
+            <p class="text-sm">此分類目前暫無歷史里程碑紀錄</p>
+          </div>
+        `;
+        return;
+      }
+
       events.forEach((item, index) => {
         const isLeft = index % 2 === 0;
         
-        // 卡片 HTML 模板
         const cardHtml = `
           <div class="relative mb-12 flex flex-col md:flex-row items-center ${isLeft ? 'md:flex-row-reverse' : ''}">
             
-            <!-- 卡片內容區 -->
+            <!-- 卡片區塊 -->
             <div class="w-full md:w-1/2 ${isLeft ? 'md:pl-10' : 'md:pr-10'} pl-16 md:pl-0">
-              <div class="bg-white rounded-2xl shadow-md hover:shadow-xl border-slate-200/80 p-5 transition duration-300 group">
-                <div class="relative overflow-hidden rounded-xl mb-4 h-44">
-                  <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                  <span class="absolute top-3 left-3 bg-blue-900/90 text-amber-300 text-xs px-2.5 py-1 rounded-full font-semibold">
+              <div class="bg-white rounded-2xl shadow-md hover:shadow-xl border border-slate-200/80 p-5 transition duration-300 group">
+                <div class="relative overflow-hidden rounded-xl mb-4 h-48 bg-slate-100">
+                  <img src="${item.image}" 
+                       referrerpolicy="no-referrer"
+                       onerror="this.src='https://placehold.co/800x500?text=震夏歷史照片'" 
+                       alt="${item.title}" 
+                       class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                  <span class="absolute top-3 left-3 bg-blue-900/95 text-amber-300 text-xs px-2.5 py-1 rounded-full font-bold shadow">
                     ${item.category}
                   </span>
                 </div>
@@ -186,18 +240,18 @@
                 <p class="text-slate-600 text-xs sm:text-sm line-clamp-2 leading-relaxed">
                   ${item.shortDesc}
                 </p>
-                <button onclick="openModal(${item.id})" class="mt-4 inline-flex items-center text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                <button onclick="openModal(${item.id})" class="mt-4 inline-flex items-center text-xs font-bold text-indigo-600 hover:text-indigo-800 transition">
                   閱讀完整故事 <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
                 </button>
               </div>
             </div>
 
-            <!-- 時間節點圓點 -->
+            <!-- 時間節點軸心圖標 -->
             <div class="absolute left-7 md:left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full bg-blue-900 border-4 border-amber-400 shadow flex items-center justify-center text-white text-xs z-10">
               <i class="fa-solid fa-clock text-[10px]"></i>
             </div>
 
-            <!-- 對側佔位區（電腦版平衡排版） -->
+            <!-- 對側佔位區 -->
             <div class="hidden md:block w-1/2"></div>
           </div>
         `;
@@ -205,27 +259,26 @@
       });
     }
 
-    // 篩選功能
-    function filterTimeline(category) {
-      // 更新按鈕樣式
+    // 分類篩選功能
+    function filterTimeline(category, btnElement) {
       document.querySelectorAll(".filter-btn").forEach(btn => {
         btn.classList.remove("bg-blue-900", "text-white");
         btn.classList.add("bg-white", "text-slate-600");
       });
-      event.target.classList.add("bg-blue-900", "text-white");
-      event.target.classList.remove("bg-white", "text-slate-600");
+      btnElement.classList.add("bg-blue-900", "text-white");
+      btnElement.classList.remove("bg-white", "text-slate-600");
 
       if (category === 'all') {
-        renderTimeline(timelineEvents);
+        renderTimeline(activeEvents);
       } else {
-        const filtered = timelineEvents.filter(e => e.category === category);
+        const filtered = activeEvents.filter(e => e.category === category);
         renderTimeline(filtered);
       }
     }
 
-    // 彈窗操作
+    // 詳情彈窗控制
     function openModal(id) {
-      const item = timelineEvents.find(e => e.id === id);
+      const item = activeEvents.find(e => e.id === id);
       if (!item) return;
       document.getElementById("modal-img").src = item.image;
       document.getElementById("modal-year").innerText = item.year;
@@ -239,10 +292,15 @@
       document.getElementById("detail-modal").classList.add("hidden");
     }
 
-    // 初始化渲染
-    window.onload = () => {
-      renderTimeline(timelineEvents);
+    window.onclick = function(e) {
+      const modal = document.getElementById("detail-modal");
+      if (e.target === modal) closeModal();
     };
+    window.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") closeModal();
+    });
+
+    window.onload = initData;
   </script>
 </body>
 </html>
